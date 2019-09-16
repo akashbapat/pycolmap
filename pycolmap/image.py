@@ -30,6 +30,13 @@ class Image:
 
     #---------------------------------------------------------------------------
 
+    def Pose(self):
+        return  np.concatenate((np.concatenate((self.R(), np.array([self.t]).T), axis=1), np.array([[0,0,0,1]])), axis = 0)  
+
+    def InvPose(self):
+        return  np.concatenate((np.concatenate((self.R().T, np.array([self.C()]).T), axis=1), np.array([[0,0,0,1]])), axis = 0)      
+
+    #---------------------------------------------------------------------------
     @property
     def t(self):
         return self.tvec

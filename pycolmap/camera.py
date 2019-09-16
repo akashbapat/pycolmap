@@ -49,8 +49,8 @@ class Camera:
             return 5
         if type_ == 4 or type_ == 'OPENCV':
             return 8
-        #if type_ == 5 or type_ == 'OPENCV_FISHEYE':
-        #    return 8
+        if type_ == 5 or type_ == 'OPENCV_FISHEYE':
+            return 8
         #if type_ == 6 or type_ == 'FULL_OPENCV':
         #    return 12
         #if type_ == 7 or type_ == 'FOV':
@@ -75,7 +75,7 @@ class Camera:
         if type_ == 2: return 'SIMPLE_RADIAL'
         if type_ == 3: return 'RADIAL'
         if type_ == 4: return 'OPENCV'
-        #if type_ == 5: return 'OPENCV_FISHEYE'
+        if type_ == 5: return 'OPENCV_FISHEYE'
         #if type_ == 6: return 'FULL_OPENCV'
         #if type_ == 7: return 'FOV'
         #if type_ == 8: return 'SIMPLE_RADIAL_FISHEYE'
@@ -120,6 +120,11 @@ class Camera:
             self.distortion_func = opencv_distortion
             self.camera_type = 4
 
+        elif type_ == 5 or type_ == 'OPENCV_FISHEYE':
+            self.fx, self.fy, self.cx, self.cy = params[:4]
+            self.k1, self.k2, self.k3, self.k4 = params[4:]
+            self.distortion_func = opencv_distortion
+            self.camera_type = 5
         else:
             raise Exception('Camera type not supported')
 
@@ -130,7 +135,7 @@ class Camera:
         s = (self.GetNameFromType(self.camera_type) +
              ' {} {} {}'.format(self.width, self.height, self.fx))
 
-        if self.camera_type in (1, 4): # PINHOLE, OPENCV
+        if self.camera_type in (1, 4, 5): # PINHOLE, OPENCV, OPENCV_FISHEYE
             s += ' {}'.format(self.fy)
 
         s += ' {} {}'.format(self.cx, self.cy)
@@ -143,6 +148,9 @@ class Camera:
 
         elif self.camera_type == 4: # OPENCV
             s += ' {} {} {} {}'.format(self.k1, self.k2, self.p1, self.p2)
+        
+        elif self.camera_type == 5: # OPENCV_FISHEYE
+            s += ' {} {} {} {}'.format(self.k1, self.k2, self.k3, self.k4)
 
         return s
 
@@ -162,6 +170,9 @@ class Camera:
         if self.camera_type == 4:
             return np.array((self.fx, self.fy, self.cx, self.cy, self.k1,
                              self.k2, self.p1, self.p2))
+        if self.camera_type == 5:
+            return np.array((self.fx, self.fy, self.cx, self.cy, self.k1,
+                             self.k2, self.k3, self.k4))
 
 
     #---------------------------------------------------------------------------
